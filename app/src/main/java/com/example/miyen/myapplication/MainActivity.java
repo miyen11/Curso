@@ -1,5 +1,8 @@
 package com.example.miyen.myapplication;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.ParcelUuid;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,36 +23,29 @@ import android.view.ViewGroup;
 
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+public class MainActivity extends AppCompatActivity implements comunicador {
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
-
+    ArrayList arrayList;
+    listCiudad listCiudad;
+    newCiudad newCiudad;
+    Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        context= this;
+        SharedPreferences preferences = getSharedPreferences( "cuidades",context.MODE_PRIVATE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -92,23 +88,24 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
+    @Override
+    public void nuevaCiudad(String nombre) {
+        crearNuevaCiudad(nombre);
+    }
+
+    @Override
+    public void mostrarCiudad() {
+        listCiudad.mostrarCiudad(mostrarCuidades());
+    }
+
+
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
@@ -120,10 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -136,11 +129,11 @@ public class MainActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position){
                 case 0:
-                    listCiudad listCiudad = new listCiudad();
+                    listCiudad = new listCiudad();
                     return listCiudad;
 
                 case 1:
-                    newCiudad newCiudad = new newCiudad() ;
+                     newCiudad = new newCiudad() ;
                     return newCiudad;
 
             }
@@ -152,5 +145,32 @@ public class MainActivity extends AppCompatActivity {
             // Show 3 total pages.
             return 2;
         }
+    }
+
+    public ArrayList<String> mostrarCuidades(){
+        arrayList = new ArrayList<String>();
+        Boolean salir= true;
+        String ciudad ="";
+        int position = arrayList.size();
+        while (salir){
+            SharedPreferences sharedPreferences = getPreferences(context.MODE_PRIVATE);
+           ciudad= sharedPreferences.getString(""+position,"no hay datos");
+            if(ciudad.equals("no hay datos")){
+                salir=false;
+            }else {
+                arrayList.add(ciudad);
+                position++;
+            }
+        }
+        return arrayList;
+    }
+
+    public void crearNuevaCiudad(String nombre){
+        SharedPreferences sharedPreferences = getPreferences(context.MODE_PRIVATE);
+        SharedPreferences.Editor edit= sharedPreferences.edit();
+        edit.putString(""+0,nombre);
+        //pos++;
+        edit.commit();
+        Toast.makeText(getApplicationContext(), "se creo", Toast.LENGTH_SHORT).show();
     }
 }
