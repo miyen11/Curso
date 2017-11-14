@@ -14,7 +14,7 @@ import android.widget.ListView;
  */
 public class listCiudad extends Fragment {
 
-
+ //nuevo
     ListView listCiudad;
     public listCiudad() {
         // Required empty public constructor
